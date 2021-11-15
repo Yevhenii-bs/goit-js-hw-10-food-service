@@ -2,47 +2,36 @@ import template from './tamplates/menu.hbs';
 import menu from './menu.json';
 import './sass/main.scss';
 
-const menuContainer = document.querySelector('.js-menu');
-const cardsMarkup = createMenuCardsMarkup(menu);
 
-menuContainer.insertAdjacentHTML('beforeend', cardsMarkup);
 
-function createMenuCardsMarkup(menu) {
-  return template(menu);
-}
+const refs = {
+    menuList: document.querySelector('.js-menu'),
+    toggleButton: document.querySelector('.theme-switch__toggle'),
+    body: document.body,
+};
 
 const Theme = {
   LIGHT: 'light-theme',
   DARK: 'dark-theme',
 };
 
-let darkMode = localStorage.getItem('Theme');
-document.body.classList.add(Theme.LIGHT);
+const theme = localStorage.getItem('Theme');
+   ( function () {
+      refs.menuList.insertAdjacentHTML('beforeend', template(menu));
+       refs.body.classList.add(theme ? theme:Theme.LIGHT);
+       refs.toggleButton.checked = theme === Theme.DARK;
+    })();
 
-const refs = {
-  body: document.querySelector('body'),
-  themeSwitcher: document.querySelector('#theme-switch-toggle'),
-};
-
-const setDarkMode = () => {
-  refs.body.classList.replace(Theme.LIGHT, Theme.DARK);
-  localStorage.setItem('Theme', Theme.DARK);
-};
-
-const setLightMode = () => {
-  refs.body.classList.replace(Theme.DARK, Theme.LIGHT);
-  localStorage.setItem('Theme', Theme.LIGHT);
-};
-
-if (darkMode === Theme.DARK) {
-  setDarkMode();
+refs.toggleButton.addEventListener('click', onChandeTheme);
+function onChandeTheme(event) {
+    if (event.target.checked) {
+        toggleTheme(Theme.DARK,Theme.LIGHT)  
+    } else {
+        toggleTheme(Theme.LIGHT,Theme.DARK) 
+    }
 }
-
-refs.themeSwitcher.addEventListener('change', () => {
-  darkMode = localStorage.getItem('Theme');
-  if (darkMode !== Theme.DARK) {
-    setDarkMode();
-  } else {
-    setLightMode();
-  }
-});
+function toggleTheme(add,rem) {
+    refs.body.classList.add(add);
+    refs.body.classList.remove(rem);
+    localStorage.setItem('Theme', add);
+}
